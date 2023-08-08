@@ -10,18 +10,18 @@ import java.util.*;
 @Slf4j
 @Repository
 public class InMemoryItemStorage implements ItemStorage {
-    private static final Map<Long, List<Item>> itemMap = new HashMap<>();
+    private final Map<Long, List<Item>> items = new HashMap<>();
 
     @Override
     public Item addItem(long userId, List<Item> items) {
-        itemMap.put(userId, items);
+        this.items.put(userId, items);
         log.info("InMemoryItemStorage метод addItem, user id = {} и items = {} добавлены", userId, items);
         return items.get(items.size() - 1);
     }
 
     @Override
     public Item updateItem(long userId, List<Item> items) {
-        itemMap.put(userId, items);
+        this.items.put(userId, items);
         log.info("InMemoryItemStorage метод updateItem, user id = {} и items = {} обновлены", userId, items);
         return items.get(items.size() - 1);
     }
@@ -34,11 +34,11 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public List<Item> getAllItemsByIdOwner(long userId) {
-        Set<Long> keySet = itemMap.keySet();
+        Set<Long> keySet = items.keySet();
         if (keySet.isEmpty()) {
             return new LinkedList<>();
         }
-        List<Item> items = itemMap.get(userId);
+        List<Item> items = this.items.get(userId);
         log.info("InMemoryItemStorage метод getAllItemsByIdOwner, userId = {}  передан для получения", userId);
         return Objects.requireNonNullElseGet(items, LinkedList::new);
     }
@@ -46,7 +46,7 @@ public class InMemoryItemStorage implements ItemStorage {
     @Override
     public List<Item> searchItem(String text) {
         List<Item> foundItems = new LinkedList<>();
-        Set<Long> keySet = itemMap.keySet();
+        Set<Long> keySet = items.keySet();
         for (Long key : keySet) {
             List<Item> items = getAllItemsByIdOwner(key);
             if (!(items.isEmpty())) {
@@ -64,12 +64,12 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     private Item checkExistId(long id) {
-        Set<Long> keySet = itemMap.keySet();
+        Set<Long> keySet = items.keySet();
         if (keySet.isEmpty()) {
             throw new NotFoundException("Список вещей пуст");
         }
         for (Long key : keySet) {
-            List<Item> items = itemMap.get(key);
+            List<Item> items = this.items.get(key);
             for (Item item : items) {
                 if (item.getId() == id) {
                     return item;
