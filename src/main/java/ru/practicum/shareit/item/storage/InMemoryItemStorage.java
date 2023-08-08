@@ -1,11 +1,13 @@
 package ru.practicum.shareit.item.storage;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
 
+@Slf4j
 @Repository
 public class InMemoryItemStorage implements ItemStorage {
     private static final Map<Long, List<Item>> itemMap = new HashMap<>();
@@ -13,17 +15,20 @@ public class InMemoryItemStorage implements ItemStorage {
     @Override
     public Item addItem(long userId, List<Item> items) {
         itemMap.put(userId, items);
+        log.info("InMemoryItemStorage метод addItem, user id = {} и items = {} добавлены", userId, items);
         return items.get(items.size() - 1);
     }
 
     @Override
     public Item updateItem(long userId, List<Item> items) {
         itemMap.put(userId, items);
+        log.info("InMemoryItemStorage метод updateItem, user id = {} и items = {} обновлены", userId, items);
         return items.get(items.size() - 1);
     }
 
     @Override
     public Item getItem(long userId, long id) {
+        log.info("InMemoryItemStorage метод getItem, userId = {} с id = {} переданы для получения", userId, id);
         return checkExistId(id);
     }
 
@@ -34,6 +39,7 @@ public class InMemoryItemStorage implements ItemStorage {
             return new LinkedList<>();
         }
         List<Item> items = itemMap.get(userId);
+        log.info("InMemoryItemStorage метод getAllItemsByIdOwner, userId = {}  передан для получения", userId);
         return Objects.requireNonNullElseGet(items, LinkedList::new);
     }
 
@@ -53,6 +59,7 @@ public class InMemoryItemStorage implements ItemStorage {
                 }
             }
         }
+        log.info("InMemoryItemStorage метод searchItem, text = {}  найден", text);
         return foundItems;
     }
 

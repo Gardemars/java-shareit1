@@ -7,13 +7,13 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class ItemDto {
-    Long id;
+    private Long id;
     @NotBlank(message = "Нет названия вещи")
-    String name;
+    private String name;
     @NotBlank(message = "Нет описания вещи")
-    String description;
+    private String description;
     @NotNull(message = "Нет статуса аренды")
-    Boolean available;
-    Long ownerId;
-    Long requestId;
+    private Boolean available;
+    private Long ownerId;
+    private Long requestId;
 }

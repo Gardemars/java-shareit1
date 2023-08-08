@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.UserValidationException;
@@ -9,6 +10,7 @@ import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     private final UserIdGenerator generator;
@@ -22,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(long id) {
+        log.info("UserServiceImpl getUser - возрат информации из userStorage");
         return userStorage.getUser(id);
     }
 
@@ -34,6 +37,7 @@ public class UserServiceImpl implements UserService {
             }
         }
         user.setId(generator.getId());
+        log.info("UserServiceImpl addUser - возрат информации из userStorage");
         return userStorage.addUser(user);
     }
 
@@ -56,16 +60,19 @@ public class UserServiceImpl implements UserService {
             }
             userUpdate.setEmail(user.getEmail());
         }
+        log.info("UserServiceImpl updateUser - возрат информации из userStorage");
         return userStorage.updateUser(userUpdate);
     }
 
     @Override
     public void deleteUser(long id) {
+        log.info("UserServiceImpl deleteUser - возрат информации из userStorage");
         userStorage.deleteUser(id);
     }
 
     @Override
     public List<User> getAllUsers() {
+        log.info("UserServiceImpl getAllUsers - возрат информации из userStorage");
         return userStorage.getAllUser();
     }
 }

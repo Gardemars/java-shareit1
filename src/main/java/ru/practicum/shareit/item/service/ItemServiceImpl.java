@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ForbiddenException;
@@ -11,6 +12,7 @@ import ru.practicum.shareit.user.service.UserService;
 import java.util.LinkedList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class ItemServiceImpl implements ItemService {
     private static final String EMPTY_STRING = "";
@@ -35,6 +37,7 @@ public class ItemServiceImpl implements ItemService {
         item.setOwner(userService.getUser(userId));
         List<Item> items = new LinkedList<>(itemStorage.getAllItemsByIdOwner(userId));
         items.add(item);
+        log.info("ItemServiceImpl addItem - возрат информации из itemStorage");
         return itemStorage.addItem(userId, items);
     }
 
@@ -60,18 +63,21 @@ public class ItemServiceImpl implements ItemService {
             updateItem.setAvailable(available);
         }
         items.add(updateItem);
+        log.info("ItemServiceImpl updateItem - возрат информации из itemStorage");
         return itemStorage.updateItem(userId, items);
     }
 
     @Override
     public Item getItem(long userId, long id) {
         userService.getUser(userId);
+        log.info("ItemServiceImpl getItem - возрат информации из itemStorage");
         return itemStorage.getItem(userId, id);
     }
 
     @Override
     public List<Item> getAllItemsByIdOwner(long userId) {
         userService.getUser(userId);
+        log.info("ItemServiceImpl getAllItemsByIdOwner - возрат информации из itemStorage");
         return itemStorage.getAllItemsByIdOwner(userId);
     }
 
@@ -79,8 +85,10 @@ public class ItemServiceImpl implements ItemService {
     public List<Item> searchItem(long userId, String text) {
         userService.getUser(userId);
         if (text.equals(EMPTY_STRING) || text.equals(SPACE_STRING)) {
+            log.info("ItemServiceImpl searchItem - text.equals(EMPTY_STRING) || text.equals(SPACE_STRING)");
             return new LinkedList<>();
         }
+        log.info("ItemServiceImpl searchItem - возрат информации из itemStorage");
         return itemStorage.searchItem(text);
     }
 }
