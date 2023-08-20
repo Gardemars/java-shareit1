@@ -1,94 +1,175 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ForbiddenException;
-import ru.practicum.shareit.item.ItemIdGenerator;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.constant.BookingStatus;
+import ru.practicum.shareit.booking.constant.State;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.booking.storage.BookingStorage;
+import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.FailIdException;
+import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.mapper.CommentMapper;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.storage.CommentStorage;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.util.LinkedList;
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-@Slf4j
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+@Slf4j
 public class ItemServiceImpl implements ItemService {
-    private static final String EMPTY_STRING = "";
-    private static final String SPACE_STRING = " ";
+    private final BookingStorage bookingStorage;
     private final ItemStorage itemStorage;
     private final UserService userService;
-    private final ItemIdGenerator generator;
+    private final BookingService bookingService;
+    private final BookingMapper bookingMapper;
+    private final CommentStorage commentStorage;
+    private final CommentMapper commentMapper;
 
-    @Autowired
-    public ItemServiceImpl(ItemStorage itemStorage,
-                           UserService userService,
-                           ItemIdGenerator generator) {
-        this.itemStorage = itemStorage;
-        this.userService = userService;
-        this.generator = generator;
+    @Transactional
+    @Override
+    public Item add(Long userId, Item item) {
+        log.info("Добавление вещи");
+        item.setOwner(userService.getByUserId(userId));
+        return itemStorage.save(item);
+    }
+
+    @Transactional
+    @Override
+    public Item update(Long itemId, Long userId, Item item) {
+        log.info(String.format("Обновление вещи c id = %d", itemId));
+
+        User user = userService.getByUserId(userId);
+        Item updateItem = this.getByItemId(itemId, userId);
+        User owner = updateItem.getOwner();
+
+        if (!user.equals(owner)) {
+            throw new FailIdException(
+                    String.format("Вы не можете обновлять информацию по предмету с id = %d", itemId));
+        }
+
+        if (item.getName() != null) {
+            updateItem.setName(item.getName());
+        }
+
+        if (item.getDescription() != null) {
+            updateItem.setDescription(item.getDescription());
+        }
+
+        if (item.getAvailable() != null) {
+            updateItem.setAvailable(item.getAvailable());
+        }
+
+        return itemStorage.save(updateItem);
+    }
+
+    @Transactional
+    @Override
+    public void remove(Long itemId) {
+        log.info(String.format("Удаление вещи с id = %d", itemId));
+        itemStorage.deleteById(itemId);
     }
 
     @Override
-    public Item addItem(long userId, Item item) {
-        userService.getUser(userId);
-        item.setId(generator.getId());
-        item.setOwner(userService.getUser(userId));
-        List<Item> items = new LinkedList<>(itemStorage.getAllItemsByIdOwner(userId));
-        items.add(item);
-        log.info("ItemServiceImpl addItem - возрат информации из itemStorage");
-        return itemStorage.addItem(userId, items);
+    public Item getByItemId(Long itemId, Long userId) {
+        log.info(String.format("Выдача вещи с id = %d", itemId));
+
+        Item item = itemStorage.findById(itemId).orElseThrow(() ->
+                new EntityNotFoundException(String.format("Предмет с id = %d не найден в базе", itemId)));
+
+
+        if (Objects.equals(item.getOwner().getId(), userId)) {
+            List<Booking> bookings = bookingStorage.findAllByItemIdAndStatusOrderByStartAsc(itemId, BookingStatus.APPROVED);
+
+            item.setNextBooking(bookingMapper.bookingToBookingShortDto(getNextBooking(bookings)));
+            item.setLastBooking(bookingMapper.bookingToBookingShortDto(getLastBooking(bookings)));
+        }
+
+        item.setComments(commentMapper.commentListToCommentDtoList(commentStorage.findAllByItemId(itemId)));
+
+        return item;
     }
 
     @Override
-    public Item updateItem(long userId, long itemId, Item item) {
-        userService.getUser(userId);
-        Item updateItem = itemStorage.getItem(userId, itemId);
-        if (updateItem.getOwner().getId() != userId) {
-            throw new ForbiddenException("Нет прав для изменения вещи");
-        }
-        List<Item> items = new LinkedList<>(itemStorage.getAllItemsByIdOwner(userId));
-        items.remove(updateItem);
-        String name = item.getName();
-        String description = item.getDescription();
-        Boolean available = item.getAvailable();
-        if (name != null) {
-            updateItem.setName(name);
-        }
-        if (description != null) {
-            updateItem.setDescription(description);
-        }
-        if (available != null) {
-            updateItem.setAvailable(available);
-        }
-        items.add(updateItem);
-        log.info("ItemServiceImpl updateItem - возрат информации из itemStorage");
-        return itemStorage.updateItem(userId, items);
+    public List<Item> getByOwnerId(Long ownerId) {
+        log.info(String.format("Выдача вещей владельца с id = %d", ownerId));
+        List<Item> items = itemStorage.findAllByOwnerId(ownerId);
+
+        return items.stream().peek(item -> {
+            List<Booking> bookings = bookingStorage.findAllByItemIdAndStatusOrderByStartAsc(item.getId(), BookingStatus.APPROVED);
+
+            item.setNextBooking(bookingMapper.bookingToBookingShortDto(getNextBooking(bookings)));
+            item.setLastBooking(bookingMapper.bookingToBookingShortDto(getLastBooking(bookings)));
+            item.setComments(commentMapper.commentListToCommentDtoList(commentStorage.findAllByItemId(item.getId())));
+
+        }).collect(Collectors.toList());
     }
 
     @Override
-    public Item getItem(long userId, long id) {
-        userService.getUser(userId);
-        log.info("ItemServiceImpl getItem - возрат информации из itemStorage");
-        return itemStorage.getItem(userId, id);
-    }
-
-    @Override
-    public List<Item> getAllItemsByIdOwner(long userId) {
-        userService.getUser(userId);
-        log.info("ItemServiceImpl getAllItemsByIdOwner - возрат информации из itemStorage");
-        return itemStorage.getAllItemsByIdOwner(userId);
-    }
-
-    @Override
-    public List<Item> searchItem(long userId, String text) {
-        userService.getUser(userId);
-        if (text.equals(EMPTY_STRING) || text.equals(SPACE_STRING)) {
-            log.info("ItemServiceImpl searchItem - text.equals(EMPTY_STRING) || text.equals(SPACE_STRING)");
-            return new LinkedList<>();
+    public List<Item> search(String text) {
+        log.info(String.format("Выдача вещи по поиску строки = %s", text.toLowerCase()));
+        if (text.isBlank()) {
+            return Collections.emptyList();
         }
-        log.info("ItemServiceImpl searchItem - возрат информации из itemStorage");
-        return itemStorage.searchItem(text);
+        return itemStorage.findByText("%" + text.toLowerCase() + "%");
+    }
+
+    @Transactional
+    @Override
+    public Comment addComment(Long itemId, Long userId, Comment comment) {
+
+        Item item = this.getByItemId(itemId, userId);
+        User user = userService.getByUserId(userId);
+        List<Booking> bookings = bookingService.getAllBookingByBookerId(userId, String.valueOf(State.PAST));
+
+        List<Booking> bookingsForItem = bookings.stream().map(booking -> {
+            boolean isBooking = Objects.equals(booking.getItem().getId(), item.getId());
+            if (isBooking) {
+                return booking;
+            }
+            return null;
+        }).collect(Collectors.toList());
+
+        if (bookingsForItem.isEmpty()) {
+            throw new ValidationException(
+                    String.format("Оставлять комментарий по предмету с id = %d можно только после взятия в аренду", itemId));
+        }
+
+        comment.setItem(item);
+        comment.setAuthor(user);
+        comment.setCreated(LocalDateTime.now());
+
+        return commentStorage.save(comment);
+    }
+
+    private Booking getNextBooking(List<Booking> bookings) {
+        List<Booking> filteredBookings = bookings.stream()
+                .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                .collect(Collectors.toList());
+
+        return filteredBookings.isEmpty() ? null : filteredBookings.get(0);
+    }
+
+    private Booking getLastBooking(List<Booking> bookings) {
+        List<Booking> filteredBookings = bookings.stream()
+                .filter(booking -> (booking.getEnd().isAfter(LocalDateTime.now())
+                        && booking.getStart().isBefore(LocalDateTime.now())) || booking.getEnd().isBefore(LocalDateTime.now()))
+                .collect(Collectors.toList());
+
+        return filteredBookings.isEmpty() ? null : filteredBookings.get(filteredBookings.size() - 1);
     }
 }
