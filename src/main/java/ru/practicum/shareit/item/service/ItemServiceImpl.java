@@ -1,6 +1,6 @@
 package ru.practicum.shareit.item.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,16 +8,16 @@ import ru.practicum.shareit.booking.constant.BookingStatus;
 import ru.practicum.shareit.booking.constant.State;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.booking.storage.BookingStorage;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.FailIdException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.storage.CommentStorage;
-import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.item.repository.CommentRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -29,15 +29,15 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Slf4j
 public class ItemServiceImpl implements ItemService {
-    private final BookingStorage bookingStorage;
-    private final ItemStorage itemStorage;
+    private final BookingRepository bookingRepository;
+    private final ItemRepository itemRepository;
     private final UserService userService;
     private final BookingService bookingService;
     private final BookingMapper bookingMapper;
-    private final CommentStorage commentStorage;
+    private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
 
     @Transactional
@@ -45,7 +45,7 @@ public class ItemServiceImpl implements ItemService {
     public Item add(Long userId, Item item) {
         log.info("Добавление вещи");
         item.setOwner(userService.getByUserId(userId));
-        return itemStorage.save(item);
+        return itemRepository.save(item);
     }
 
     @Transactional
@@ -74,32 +74,32 @@ public class ItemServiceImpl implements ItemService {
             updateItem.setAvailable(item.getAvailable());
         }
 
-        return itemStorage.save(updateItem);
+        return itemRepository.save(updateItem);
     }
 
     @Transactional
     @Override
     public void remove(Long itemId) {
         log.info(String.format("Удаление вещи с id = %d", itemId));
-        itemStorage.deleteById(itemId);
+        itemRepository.deleteById(itemId);
     }
 
     @Override
     public Item getByItemId(Long itemId, Long userId) {
         log.info(String.format("Выдача вещи с id = %d", itemId));
 
-        Item item = itemStorage.findById(itemId).orElseThrow(() ->
+        Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Предмет с id = %d не найден в базе", itemId)));
 
 
         if (Objects.equals(item.getOwner().getId(), userId)) {
-            List<Booking> bookings = bookingStorage.findAllByItemIdAndStatusOrderByStartAsc(itemId, BookingStatus.APPROVED);
+            List<Booking> bookings = bookingRepository.findAllByItemIdAndStatusOrderByStartAsc(itemId, BookingStatus.APPROVED);
 
             item.setNextBooking(bookingMapper.bookingToBookingShortDto(getNextBooking(bookings)));
             item.setLastBooking(bookingMapper.bookingToBookingShortDto(getLastBooking(bookings)));
         }
 
-        item.setComments(commentMapper.commentListToCommentDtoList(commentStorage.findAllByItemId(itemId)));
+        item.setComments(commentMapper.commentListToCommentDtoList(commentRepository.findAllByItemId(itemId)));
 
         return item;
     }
@@ -107,14 +107,14 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<Item> getByOwnerId(Long ownerId) {
         log.info(String.format("Выдача вещей владельца с id = %d", ownerId));
-        List<Item> items = itemStorage.findAllByOwnerId(ownerId);
+        List<Item> items = itemRepository.findAllByOwnerId(ownerId);
 
         return items.stream().peek(item -> {
-            List<Booking> bookings = bookingStorage.findAllByItemIdAndStatusOrderByStartAsc(item.getId(), BookingStatus.APPROVED);
+            List<Booking> bookings = bookingRepository.findAllByItemIdAndStatusOrderByStartAsc(item.getId(), BookingStatus.APPROVED);
 
             item.setNextBooking(bookingMapper.bookingToBookingShortDto(getNextBooking(bookings)));
             item.setLastBooking(bookingMapper.bookingToBookingShortDto(getLastBooking(bookings)));
-            item.setComments(commentMapper.commentListToCommentDtoList(commentStorage.findAllByItemId(item.getId())));
+            item.setComments(commentMapper.commentListToCommentDtoList(commentRepository.findAllByItemId(item.getId())));
 
         }).collect(Collectors.toList());
     }
@@ -125,7 +125,7 @@ public class ItemServiceImpl implements ItemService {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemStorage.findByText("%" + text.toLowerCase() + "%");
+        return itemRepository.findByText("%" + text.toLowerCase() + "%");
     }
 
     @Transactional
@@ -153,7 +153,7 @@ public class ItemServiceImpl implements ItemService {
         comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
 
-        return commentStorage.save(comment);
+        return commentRepository.save(comment);
     }
 
     private Booking getNextBooking(List<Booking> bookings) {

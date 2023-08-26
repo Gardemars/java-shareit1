@@ -15,19 +15,20 @@ import java.util.Objects;
 @ToString
 @Builder
 @Entity
-@Table(name = "ITEMS")
+@Table(name = "items")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Item {
     @Id
-    @Column(name = "ITEM_ID")
+    @Column(name = "item_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String description;
     private Boolean available;
+    @ToString.Exclude
     @ManyToOne
-    @JoinColumn(name = "OWNER_ID")
+    @JoinColumn(name = "owner_id")
     private User owner;
     @Transient
     private BookingShortDto lastBooking;

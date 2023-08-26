@@ -11,7 +11,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@Table(name = "COMMENTS")
+@Table(name = "comments")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,9 +22,11 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String text;
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "author_id")
     private User author;

@@ -14,29 +14,29 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@Table
+@Table(name = "booking")
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Booking {
     @Id
-    @Column(name = "BOOKING_ID")
+    @Column(name = "booking_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "START_TIME")
+    @Column(name = "start_time")
     private LocalDateTime start;
 
-    @Column(name = "END_TIME")
+    @Column(name = "end_time")
     private LocalDateTime end;
 
     @ManyToOne
-    @JoinColumn(name = "ITEM_ID")
+    @JoinColumn(name = "item_id")
     private Item item;
 
     @ManyToOne
-    @JoinColumn(name = "BOOKER_ID")
+    @JoinColumn(name = "booker_id")
     private User booker;
 
     @Enumerated(EnumType.STRING)

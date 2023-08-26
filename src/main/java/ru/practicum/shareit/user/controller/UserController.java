@@ -20,7 +20,6 @@ public class UserController {
 
     @PostMapping
     public UserDto add(@Valid @RequestBody UserDto userDto) {
-        //Обычно mapper используется на уровне контроллеров
         return userMapper.userToUserDto(userService.add(userMapper.userDtoToUser(userDto)));
     }
 
