@@ -1,78 +1,76 @@
 package ru.practicum.shareit.user.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.UserValidationException;
-import ru.practicum.shareit.user.UserIdGenerator;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exception.DuplicateEmailException;
+import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 
-@Slf4j
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
-    private final UserIdGenerator generator;
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
-    @Autowired
-    public UserServiceImpl(UserIdGenerator generator, UserStorage userStorage) {
-        this.generator = generator;
-        this.userStorage = userStorage;
-    }
-
+    @Transactional
     @Override
-    public User getUser(long id) {
-        log.info("UserServiceImpl getUser - возрат информации из userStorage");
-        return userStorage.getUser(id);
-    }
-
-    @Override
-    public User addUser(User user) {
-        List<User> userList = userStorage.getAllUser();
-        for (User userValid : userList) {
-            if (user.getEmail().equals(userValid.getEmail())) {
-                throw new UserValidationException("Пользователь с такой почтой уже есть" + user.getEmail());
-            }
+    public User add(User user) {
+        log.info("Добавление пользователя");
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException exp) {
+            throw new DuplicateEmailException(String.format(
+                    "Пользователь с email = %s уже зарегистрирован", user.getEmail()));
         }
-        user.setId(generator.getId());
-        log.info("UserServiceImpl addUser - возрат информации из userStorage");
-        return userStorage.addUser(user);
     }
 
+    @Transactional
     @Override
-    public User updateUser(long id, User user) {
-        User userUpdate = userStorage.getUser(id);
-        String name = user.getName();
-        String email = user.getEmail();
-        if (name != null) {
-            userUpdate.setName(user.getName());
+    public User update(Long id, User user) {
+        log.info(String.format("Обновление пользователя c id = %d", id));
+        User updateUser = this.getByUserId(id);
+
+        if (user.getEmail() != null) {
+            updateUser.setEmail(user.getEmail());
         }
-        if (email != null) {
-            List<User> userList = userStorage.getAllUser();
-            if (!(userList.isEmpty())) {
-                for (User userValid : userList) {
-                    if (user.getEmail().equals(userValid.getEmail()) && id != userValid.getId()) {
-                        throw new UserValidationException("Пользователь с такой почтой уже есть " + user.getEmail());
-                    }
-                }
-            }
-            userUpdate.setEmail(user.getEmail());
+
+        if (user.getName() != null) {
+            updateUser.setName(user.getName());
         }
-        log.info("UserServiceImpl updateUser - возрат информации из userStorage");
-        return userStorage.updateUser(userUpdate);
+
+        try {
+            return userRepository.save(updateUser);
+        } catch (DataIntegrityViolationException exp) {
+            throw new DuplicateEmailException(String.format(
+                    "Пользователь с email = %s уже зарегистрирован", user.getEmail()));
+        }
+    }
+
+    @Transactional
+    @Override
+    public void remove(Long id) {
+        log.info(String.format("Удаление пользователя c id = %d", id));
+        userRepository.deleteById(id);
     }
 
     @Override
-    public void deleteUser(long id) {
-        log.info("UserServiceImpl deleteUser - возрат информации из userStorage");
-        userStorage.deleteUser(id);
+    public List<User> getAll() {
+        log.info("Выдача всех пользователей");
+        return userRepository.findAll();
     }
 
+    @Transactional
     @Override
-    public List<User> getAllUsers() {
-        log.info("UserServiceImpl getAllUsers - возрат информации из userStorage");
-        return userStorage.getAllUser();
+    public User getByUserId(Long id) {
+        log.info(String.format("Выдача пользователя c id = %d", id));
+        return userRepository.findById(id).orElseThrow(()
+                -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", id)));
     }
 }
