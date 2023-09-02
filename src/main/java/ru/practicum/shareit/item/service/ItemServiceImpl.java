@@ -40,6 +40,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final RequestRepository requestRepository;
+
     @Transactional
     @Override
     public Item add(Long userId, Long requestId, Item item) {
