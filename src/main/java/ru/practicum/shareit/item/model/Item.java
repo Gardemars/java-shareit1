@@ -1,9 +1,6 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.request.model.Request;
@@ -27,6 +24,7 @@ public class Item {
     private String description;
     private Boolean available;
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
@@ -40,6 +38,7 @@ public class Item {
     @Transient
     private List<CommentDto> comments;
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "request_id")
     private Request request;
