@@ -1,18 +1,15 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import org.hibernate.Hibernate;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Objects;
 
-@Getter
-@Setter
-@ToString
+@Data
 @Builder
 @Entity
 @Table(name = "items")
@@ -26,27 +23,23 @@ public class Item {
     private String name;
     private String description;
     private Boolean available;
+
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
     @Transient
     private BookingShortDto lastBooking;
+
     @Transient
     private BookingShortDto nextBooking;
+
     @Transient
     private List<CommentDto> comments;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Item item = (Item) o;
-        return id != null && Objects.equals(id, item.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+    @ToString.Exclude
+    @ManyToOne
+    @JoinColumn(name = "request_id")
+    private Request request;
 }

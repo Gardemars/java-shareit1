@@ -24,7 +24,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorResponse handleBindException(MethodArgumentNotValidException exp) {
-        //Ошибок валидации может быть несколько - возвращаем информацию по всем полям
         Map<String, String> errors = exp.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.toMap(FieldError::getField,
                         Objects.requireNonNull(DefaultMessageSourceResolvable::getDefaultMessage)));
@@ -41,7 +40,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDuplicateLike(final DuplicateEmailException exp) {
+    public ErrorResponse handleDuplicateEmailException(final DuplicateEmailException exp) {
         log.error(exp.getMessage());
         return new ErrorResponse(exp.getMessage());
     }

@@ -1,15 +1,14 @@
 package ru.practicum.shareit.item.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.constant.BookingStatus;
-import ru.practicum.shareit.booking.constant.State;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.FailIdException;
 import ru.practicum.shareit.exception.ValidationException;
@@ -18,8 +17,10 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.Request;
+import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -29,22 +30,27 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
-    private final UserService userService;
-    private final BookingService bookingService;
+    private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
-
+    private final RequestRepository requestRepository;
     @Transactional
     @Override
-    public Item add(Long userId, Item item) {
+    public Item add(Long userId, Long requestId, Item item) {
         log.info("Добавление вещи");
-        item.setOwner(userService.getByUserId(userId));
+        item.setOwner(userRepository.findById(userId).orElseThrow(()
+                -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", userId))));
+        if (requestId != null) {
+            Request request = requestRepository.findById(requestId).orElseThrow(()
+                    -> new EntityNotFoundException(String.format("Запрос с id = %d не найден в базе", requestId)));
+            item.setRequest(request);
+        }
         return itemRepository.save(item);
     }
 
@@ -52,8 +58,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item update(Long itemId, Long userId, Item item) {
         log.info(String.format("Обновление вещи c id = %d", itemId));
-
-        User user = userService.getByUserId(userId);
+        User user = userRepository.findById(userId).orElseThrow(()
+                -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", userId)));
         Item updateItem = this.getByItemId(itemId, userId);
         User owner = updateItem.getOwner();
 
@@ -91,7 +97,6 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Предмет с id = %d не найден в базе", itemId)));
 
-
         if (Objects.equals(item.getOwner().getId(), userId)) {
             List<Booking> bookings = bookingRepository.findAllByItemIdAndStatusOrderByStartAsc(itemId, BookingStatus.APPROVED);
 
@@ -105,36 +110,39 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> getByOwnerId(Long ownerId) {
+    public List<Item> getByOwnerId(Long ownerId, Pageable pageable) {
         log.info(String.format("Выдача вещей владельца с id = %d", ownerId));
-        List<Item> items = itemRepository.findAllByOwnerId(ownerId);
+        List<Item> items = itemRepository.findAllByOwnerId(ownerId, pageable);
 
-        return items.stream().peek(item -> {
+        return items.stream().map(item -> {
             List<Booking> bookings = bookingRepository.findAllByItemIdAndStatusOrderByStartAsc(item.getId(), BookingStatus.APPROVED);
 
             item.setNextBooking(bookingMapper.bookingToBookingShortDto(getNextBooking(bookings)));
             item.setLastBooking(bookingMapper.bookingToBookingShortDto(getLastBooking(bookings)));
             item.setComments(commentMapper.commentListToCommentDtoList(commentRepository.findAllByItemId(item.getId())));
 
+            return item;
+
         }).collect(Collectors.toList());
     }
 
     @Override
-    public List<Item> search(String text) {
+    public List<Item> search(String text, Pageable pageable) {
         log.info(String.format("Выдача вещи по поиску строки = %s", text.toLowerCase()));
         if (text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemRepository.findByText("%" + text.toLowerCase() + "%");
+        return itemRepository.findByText("%" + text.toLowerCase() + "%", pageable);
     }
 
     @Transactional
     @Override
     public Comment addComment(Long itemId, Long userId, Comment comment) {
-
-        Item item = this.getByItemId(itemId, userId);
-        User user = userService.getByUserId(userId);
-        List<Booking> bookings = bookingService.getAllBookingByBookerId(userId, String.valueOf(State.PAST));
+        Item item = itemRepository.findById(itemId).orElseThrow(() ->
+                new EntityNotFoundException(String.format("Предмет с id = %d не найден в базе", itemId)));
+        User user = userRepository.findById(userId).orElseThrow(()
+                -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", userId)));
+        List<Booking> bookings = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
 
         List<Booking> bookingsForItem = bookings.stream().map(booking -> {
             boolean isBooking = Objects.equals(booking.getItem().getId(), item.getId());

@@ -1,10 +1,16 @@
 package ru.practicum.shareit.user.dto;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.Email;
 
-@Value
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class UpdateUserDto {
     String name;
     @Email(message = "Введите правильный email")
