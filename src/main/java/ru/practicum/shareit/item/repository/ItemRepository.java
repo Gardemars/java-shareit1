@@ -17,7 +17,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findAllByRequestId(Long requestId);
 
     @Query(value = "SELECT * FROM items i " +
-            "WHERE LOWER(i.NAME) LIKE :text OR LOWER(i.DESCRIPTION) LIKE :text " +
-            "AND i.AVAILABLE IS TRUE", nativeQuery = true)
+            "WHERE LOWER(i.name) LIKE :text OR LOWER(i.description) LIKE :text " +
+            "AND i.available IS TRUE", nativeQuery = true)
     List<Item> findByText(@Param("text") String text, Pageable pageable);
 }

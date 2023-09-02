@@ -33,6 +33,7 @@ public class RequestServerTest {
 
     private final Long userId = 1L;
     private final Long requestId = 1L;
+
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -53,13 +54,13 @@ public class RequestServerTest {
     private Request request = new Request(
             requestId,
             "description",
-            LocalDateTime.now(),
+            LocalDateTime.of(2023, 8, 26, 11, 0, 0),
             user);
 
     private RequestWithItemDto requestWithItemDto = new RequestWithItemDto(
             requestId,
             request.getDescription(),
-            LocalDateTime.now(),
+            LocalDateTime.of(2023, 8, 26, 11, 0, 0),
             List.of(new ItemDto()));
 
     private ItemDto itemDto = new ItemDto(
@@ -84,7 +85,8 @@ public class RequestServerTest {
         Request request1 = requestService.add(userId, newRequest);
 
         assertThat(request1.getDescription()).isEqualTo(newRequest.getDescription());
-        assertThat(request1.getCreated()).isBefore(LocalDateTime.now());
+        assertThat(request1.getCreated()).isBefore(LocalDateTime.of(2023, 9, 26, 11,
+                0, 0));
         assertThat(request1.getUser()).isEqualTo(user);
     }
 

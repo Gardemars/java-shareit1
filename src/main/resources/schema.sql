@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS requests
     description VARCHAR(255) NOT NULL,
     created     TIMESTAMP    NOT NULL,
     user_id     INTEGER      NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES USERS (user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS items
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS items
     constraint "ITEMS_USERS_fk"
         foreign key (owner_id) references users (user_id) ON DELETE CASCADE,
     constraint "ITEMS_REQUESTS_fk"
-        foreign key (request_id) REFERENCES REQUESTS (request_id)
+        foreign key (request_id) REFERENCES requests (request_id)
 );
 
 CREATE TABLE IF NOT EXISTS booking

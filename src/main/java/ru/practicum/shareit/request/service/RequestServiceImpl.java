@@ -46,7 +46,6 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestWithItemDto> getAllRequestsByOwnerId(Long ownerId) {
         log.info(String.format("Выдача запросов пользователя c id = %d", ownerId));
-        //проверка наличия пользователя отправившего запрос
         userRepository.findById(ownerId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", ownerId)));
         return requestRepository.findAllByUserIdOrderByCreatedDesc(ownerId)
@@ -56,7 +55,6 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestWithItemDto> getAllRequest(Long userId, Pageable pageable) {
         log.info("Выдача всех запросов");
-        //проверка наличия пользователя отправившего запрос
         userRepository.findById(userId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", userId)));
         return requestRepository.findAllByUserIdNotOrderByCreatedDesc(userId, pageable)
@@ -73,7 +71,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public RequestWithItemDto getByRequestIdWithItem(Long requestId, Long userId) {
         log.info(String.format("Выдача запроса вместе с ответами id = %d", requestId));
-        // проверка наличия пользователя отправившего запрос
+
         userRepository.findById(userId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", userId)));
 
