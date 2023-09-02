@@ -23,7 +23,7 @@ public class Request {
     private String description;
 
     private LocalDateTime created;
-    @ToString.Exclude
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
