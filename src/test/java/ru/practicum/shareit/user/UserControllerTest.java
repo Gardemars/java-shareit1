@@ -82,13 +82,13 @@ public class UserControllerTest {
     }
 
     @Test
-    void remove_shouldReturnOkStatus() throws Exception {
+    void removeShouldReturnOkStatus() throws Exception {
         mockMvc.perform(delete("/users/" + userId))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void getAll_shouldReturnListOfUsers() throws Exception {
+    void getAllShouldReturnListOfUsers() throws Exception {
         List<UserDto> usersDto = List.of(
                 userDto
         );
@@ -108,7 +108,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getAll_shouldReturnEmptyList() throws Exception {
+    void getAllShouldReturnEmptyList() throws Exception {
         List<UserDto> usersDto = Collections.emptyList();
         List<User> users = Collections.emptyList();
 
@@ -123,13 +123,13 @@ public class UserControllerTest {
     }
 
     @Test
-    void getById_shouldReturnInternalServerError() throws Exception {
+    void getByIdShouldReturnInternalServerError() throws Exception {
         mockMvc.perform(get("/users/why"))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
-    void getById_shouldReturnNotFound() throws Exception {
+    void getByIdShouldReturnNotFound() throws Exception {
 
         when(userMapper.userToUserDto(any()))
                 .thenThrow(new EntityNotFoundException((String.format("Пользователь с id = %d не найден в базе", userId))));
@@ -139,7 +139,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getById_shouldReturnUser() throws Exception {
+    void getByIdShouldReturnUser() throws Exception {
 
         when(userService.getByUserId(userId)).thenReturn(user);
         when(userMapper.userToUserDto(userService.getByUserId(userId))).thenReturn(userDto);
@@ -152,7 +152,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void update_shouldUpdateUser() throws Exception {
+    void updateShouldUpdateUser() throws Exception {
 
         UpdateUserDto updateUserDto = new UpdateUserDto(user.getName(), user.getEmail());
 
@@ -172,7 +172,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void update_shouldReturnNotFound() throws Exception {
+    void updateShouldReturnNotFound() throws Exception {
 
         UpdateUserDto updateUserDto = new UpdateUserDto(user.getName(), user.getEmail());
 

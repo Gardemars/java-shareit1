@@ -35,25 +35,25 @@ public class UserServiceTest {
 
 
     @Test
-    void add_shouldReturnUser() {
+    void addShouldReturnUser() {
         when(userRepository.save(user)).thenReturn(user);
         assertThat(userService.add(user)).isEqualTo(user);
     }
 
     @Test
-    void add_shouldReturnDuplicateEmailException() {
+    void addShouldReturnDuplicateEmailException() {
         when(userRepository.save(user)).thenThrow(new DataIntegrityViolationException(""));
         assertThatThrownBy(() -> userService.add(user)).isInstanceOf(DuplicateEmailException.class);
     }
 
     @Test
-    void update_shouldThrowEntityNotFoundException() {
+    void updateShouldThrowEntityNotFoundException() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThatThrownBy(() -> userService.getByUserId(userId)).isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void update_shouldUpdateEmail() {
+    void updateShouldUpdateEmail() {
         User newUser = User.builder()
                 .id(null)
                 .name(null)
@@ -66,7 +66,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void update_shouldUpdateName() {
+    void updateShouldUpdateName() {
         User newUser = User.builder()
                 .id(null)
                 .name("newName")
@@ -79,7 +79,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void update_shouldThrowDuplicateEmailException() {
+    void updateShouldThrowDuplicateEmailException() {
         User newUser = User.builder()
                 .id(null)
                 .name("newName")
@@ -92,7 +92,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void getAll_shouldReturnListOfUsers() {
+    void getAllShouldReturnListOfUsers() {
         List<User> users = List.of(user);
 
         when(userRepository.findAll()).thenReturn(users);
@@ -101,13 +101,13 @@ public class UserServiceTest {
     }
 
     @Test
-    void getByUserId_shouldThrowEntityNotFoundException() {
+    void getByUserIdShouldThrowEntityNotFoundException() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThatThrownBy(() -> userService.getByUserId(userId)).isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void getById_shouldReturnUser() {
+    void getByIdShouldReturnUser() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         assertThat(userService.getByUserId(userId)).isEqualTo(user);
     }

@@ -92,7 +92,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    void add_shouldCreateAndReturnNewBooking() throws Exception {
+    void addShouldCreateAndReturnNewBooking() throws Exception {
         BookingRequestDto bookingRequestDto = new BookingRequestDto(1L, LocalDateTime.now(), LocalDateTime.now());
         BookingRequestDto bookingRequestDto1 = new BookingRequestDto(1L, null, null);
 
@@ -113,7 +113,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    void getByBookingId_shouldReturnBooking() throws Exception {
+    void getByBookingIdShouldReturnBooking() throws Exception {
         when(bookingMapper.bookingToBookingAnswerDto(any())).thenReturn(bookingAnswerDto);
 
         mockMvc.perform(get("/bookings/" + bookingId).header(USER_ID_HEADER, bookerId))
@@ -122,7 +122,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    void getByBookingId_shouldReturnNotFound() throws Exception {
+    void getByBookingIdShouldReturnNotFound() throws Exception {
         when(bookingMapper.bookingToBookingAnswerDto(any())).thenThrow(new FailIdException(""));
 
         mockMvc.perform(get("/bookings/" + bookingId).header(USER_ID_HEADER, bookerId))

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @AllArgsConstructor
@@ -34,6 +36,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingNewAnswerDto add(Long bookerId, Long itemId, Booking booking) {
+        log.info(String.format("Бронирование предмета с id = %d", itemId));
         User booker = userRepository.findById(bookerId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", bookerId)));
 
@@ -61,6 +64,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking getByBookingId(Long bookingId, Long userId) {
+        log.info(String.format("Получение по Id bookerId = %d и userId = %d", bookingId, userId));
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Броннирование с id = %d не найдено в базе", bookingId)));
 
@@ -71,13 +75,13 @@ public class BookingServiceImpl implements BookingService {
             throw new FailIdException(String.format(
                     "Просматривать броннирование с id = %d может только владелец броннирования/вещи", bookingId));
         }
-
         return booking;
     }
 
     @Transactional
     @Override
     public Booking approved(Long bookingId, Long ownerId, boolean isApprove) {
+        log.info(String.format("Подтверждние бронирования id = %d", bookingId));
         Booking booking = this.getByBookingId(bookingId, ownerId);
         BookingStatus status = booking.getStatus();
 
@@ -86,9 +90,9 @@ public class BookingServiceImpl implements BookingService {
                     "Статус бронирования с id = %d уже был изменен ", bookingId));
         }
 
-        //Владелец вещи отвечает на запрос
         if (Objects.equals(booking.getItem().getOwner().getId(), ownerId)) {
             booking.setStatus(isApprove ? BookingStatus.APPROVED : BookingStatus.REJECTED);
+            log.info(String.format("Статус бронирования = {}", booking.getStatus()));
             return bookingRepository.save(booking);
         }
 
@@ -98,8 +102,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Booking> getAllBookingByOwnerId(Long ownerId, String state, Pageable pageable) {
+        log.info(String.format("Выдача перечня забронированых вещей с владельцем с id = %d", ownerId));
+
         List<Item> items = itemRepository.findAllByOwnerId(ownerId);
-        // Если нет вещей этого пользователя в базе - ошибка
+
         if (items.isEmpty()) {
             throw new FailIdException(String.format(
                     "Владелец вещей с id = %d отсутствует в базе", ownerId));
@@ -120,16 +126,17 @@ public class BookingServiceImpl implements BookingService {
                 case REJECTED:
                     return bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(ownerId, BookingStatus.REJECTED, pageable);
                 default:
-                    throw new StatusException();
+                    throw new StatusException("Unknown state: UNSUPPORTED_STATUS");
             }
         } catch (IllegalArgumentException exp) {
-            throw new StatusException();
+            throw new StatusException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 
     @Override
     public List<Booking> getAllBookingByBookerId(Long bookerId, String state, Pageable pageable) {
-        //Проверка наличия такого пользователя в системе
+        log.info(String.format("Выдача перечня забронированых вещей с пользователем с id = %d", bookerId));
+
         userRepository.findById(bookerId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", bookerId)));
 
@@ -148,15 +155,17 @@ public class BookingServiceImpl implements BookingService {
                 case REJECTED:
                     return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(bookerId, BookingStatus.REJECTED, pageable);
                 default:
-                    throw new StatusException();
+                    throw new StatusException("Unknown state: UNSUPPORTED_STATUS");
             }
         } catch (IllegalArgumentException exp) {
-            throw new StatusException();
+            throw new StatusException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 
 
     private void checkTimeValidation(Booking booking) {
+        log.info("Проверка времени");
+
         boolean isStartInPast = booking.getStart().isBefore(LocalDateTime.now());
         boolean isEndInPast = booking.getEnd().isBefore(LocalDateTime.now());
         boolean isEndBeforeStart = booking.getEnd().isBefore(booking.getStart());

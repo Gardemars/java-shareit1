@@ -43,7 +43,7 @@ public class UserMapperTest {
     }
 
     @Test
-    void userToUserDto_shouldReturnNull() {
+    void userToUserDtoShouldReturnNull() {
         UserDto dto = userMapper.userToUserDto(null);
         assertThat(dto).isEqualTo(null);
     }
@@ -55,7 +55,7 @@ public class UserMapperTest {
     }
 
     @Test
-    void requestUserDtoToUser_shouldReturnNull() {
+    void requestUserDtoToUserShouldReturnNull() {
         User user1 = userMapper.requestUserDtoToUser(null);
         assertThat(user1).isEqualTo(null);
     }
@@ -74,7 +74,7 @@ public class UserMapperTest {
     }
 
     @Test
-    void updateUserDtoToUser_shouldReturnNull() {
+    void updateUserDtoToUserShouldReturnNull() {
         User user1 = userMapper.updateUserDtoToUser(null);
         assertThat(user1).isEqualTo(null);
     }

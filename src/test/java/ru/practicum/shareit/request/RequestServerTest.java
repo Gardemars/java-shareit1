@@ -71,7 +71,7 @@ public class RequestServerTest {
             null);
 
     @Test
-    void add_shouldCreateNewRequest() {
+    void addShouldCreateNewRequest() {
         Request newRequest = Request.builder()
                 .id(null)
                 .description("text")
@@ -91,7 +91,7 @@ public class RequestServerTest {
     }
 
     @Test
-    void add_shouldThrowEntityNotFoundExceptionIfUserIsNotExists() {
+    void addShouldThrowEntityNotFoundExceptionIfUserIsNotExists() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> requestService.add(userId, request))
@@ -99,7 +99,7 @@ public class RequestServerTest {
     }
 
     @Test
-    void getAllRequestsByOwnerId_shouldReturnListOfRequests() {
+    void getAllRequestsByOwnerIdShouldReturnListOfRequests() {
         List<Request> requests = List.of(request);
         List<ItemDto> items = List.of(itemDto);
 
@@ -115,27 +115,27 @@ public class RequestServerTest {
     }
 
     @Test
-    void getAllRequestsByOwnerId_shouldThrowEntityNotFoundException() {
+    void getAllRequestsByOwnerIdShouldThrowEntityNotFoundException() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> requestService.getAllRequestsByOwnerId(userId))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void getByRequestId_shouldReturnRequest() {
+    void getByRequestIdShouldReturnRequest() {
         when(requestRepository.findById(requestId)).thenReturn(Optional.of(request));
         assertThat(requestService.getByRequestId(requestId)).isEqualTo(request);
     }
 
     @Test
-    void getByRequestId_shouldThrowEntityNotFoundException() {
+    void getByRequestIdShouldThrowEntityNotFoundException() {
         when(requestRepository.findById(requestId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> requestService.getByRequestId(requestId))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void getAllRequests_shouldReturnListOfRequests() {
+    void getAllRequestsShouldReturnListOfRequests() {
         List<Request> requests = List.of(request);
         List<ItemDto> items = List.of(itemDto);
 
@@ -150,21 +150,21 @@ public class RequestServerTest {
     }
 
     @Test
-    void getAllRequests_shouldThrowEntityNotFoundException() {
+    void getAllRequestsShouldThrowEntityNotFoundException() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> requestService.getAllRequest(userId, PaginationMapper.toMakePage(1, 1)))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void getAllRequests_shouldReturnValidationException() {
+    void getAllRequestsShouldReturnValidationException() {
         assertThatThrownBy(() ->
                 requestService.getAllRequest(userId, PaginationMapper.toMakePage(0, 0)))
                 .isInstanceOf(ValidationException.class);
     }
 
     @Test
-    void getByRequestIdIdWithItem_shouldReturnRequest() {
+    void getByRequestIdIdWithItemShouldReturnRequest() {
         List<ItemDto> items = List.of(itemDto);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -176,7 +176,7 @@ public class RequestServerTest {
     }
 
     @Test
-    void getByRequestIdIdWithItem_shouldThrowEntityNotFoundExceptionIfNotRequest() {
+    void getByRequestIdIdWithItemShouldThrowEntityNotFoundExceptionIfNotRequest() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(requestRepository.findById(requestId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> requestService.getByRequestIdWithItem(requestId, userId))
@@ -184,7 +184,7 @@ public class RequestServerTest {
     }
 
     @Test
-    void getByRequestIdIdWithItem_shouldThrowEntityNotFoundExceptionIfNotUser() {
+    void getByRequestIdIdWithItemShouldThrowEntityNotFoundExceptionIfNotUser() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> requestService.getByRequestIdWithItem(requestId, userId))
                 .isInstanceOf(EntityNotFoundException.class);

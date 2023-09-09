@@ -82,6 +82,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private RequestWithItemDto addItemsForRequest(Request request) {
+        log.info("Добавление вещей для запроса");
         List<ItemDto> items = itemMapper.itemListToItemDtoList(itemRepository.findAllByRequestId(request.getId()));
         RequestWithItemDto requestWithItemDto = requestMapper.requestToRequestWithItemDto(request);
         requestWithItemDto.setItems(items);

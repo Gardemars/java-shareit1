@@ -128,7 +128,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void add_shouldCreateBooking() {
+    void addShouldCreateBooking() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item1));
         when(bookingMapper.bookingToBookingNewAnswerDto(any())).thenReturn(bookingNewAnswerDto);
@@ -143,7 +143,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void add_shouldThrowValidationException() {
+    void addShouldThrowValidationException() {
         Booking wrongTimeBooking = Booking.builder()
                 .id(1L)
                 .start(LocalDateTime.now())
@@ -180,7 +180,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void add_shouldThrowEntityNotFoundExceptionIfNotItem() {
+    void addShouldThrowEntityNotFoundExceptionIfNotItem() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> bookingService.add(userId, itemId, newBooking))
@@ -188,14 +188,14 @@ public class BookingServerTest {
     }
 
     @Test
-    void add_shouldThrowEntityNotFoundExceptionIfNotUser() {
+    void addShouldThrowEntityNotFoundExceptionIfNotUser() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> bookingService.add(userId, itemId, newBooking))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void add_shouldThrowItemNotAvailableException() {
+    void addShouldThrowItemNotAvailableException() {
         item1.setAvailable(false);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item1));
@@ -205,7 +205,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void add_shouldThrowFailIdException() {
+    void addShouldThrowFailIdException() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
 
@@ -214,14 +214,14 @@ public class BookingServerTest {
     }
 
     @Test
-    void getByBookingId_shouldReturnBooking() {
+    void getByBookingIdShouldReturnBooking() {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 
         assertThat(bookingService.getByBookingId(bookingId, userId)).isEqualTo(booking);
     }
 
     @Test
-    void getByBookingId_shouldThrowEntityNotFoundException() {
+    void getByBookingIdShouldThrowEntityNotFoundException() {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> bookingService.getByBookingId(bookingId, userId))
@@ -229,7 +229,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void getByBookingId_shouldThrowFailIdException() {
+    void getByBookingIdShouldThrowFailIdException() {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 
         assertThatThrownBy(() -> bookingService.getByBookingId(bookingId, 4L))
@@ -237,7 +237,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void approve_shouldReturnBookingWithApprovedStatus() {
+    void approveShouldReturnBookingWithApprovedStatus() {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(bookingRepository.save(any())).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
 
@@ -245,7 +245,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void approve_shouldThrowValidationException() {
+    void approveShouldThrowValidationException() {
         booking.setStatus(BookingStatus.APPROVED);
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 
@@ -254,7 +254,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void approve_shouldThrowFailIdException() {
+    void approveShouldThrowFailIdException() {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 
         assertThatThrownBy(() -> bookingService.approved(bookingId, 4L, true))
@@ -262,14 +262,14 @@ public class BookingServerTest {
     }
 
     @Test
-    void getAllBookingByBookerId_shouldCallFindAllByBookerIdOrderByStartDesc() {
+    void getAllBookingByBookerIdShouldCallFindAllByBookerIdOrderByStartDesc() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         bookingService.getAllBookingByBookerId(userId, "ALL", null);
         verify(bookingRepository).findAllByBookerIdOrderByStartDesc(anyLong(), any());
     }
 
     @Test
-    void getAllBookingByBookerId_shouldCallFindAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc() {
+    void getAllBookingByBookerIdShouldCallFindAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         bookingService.getAllBookingByBookerId(userId, "CURRENT", null);
         verify(bookingRepository)
@@ -277,7 +277,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void getAllBookingByBookerId_shouldCallFindAllByBookerIdAndEndBeforeOrderByStartDesc() {
+    void getAllBookingByBookerIdShouldCallFindAllByBookerIdAndEndBeforeOrderByStartDesc() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         bookingService.getAllBookingByBookerId(userId, "PAST", null);
         verify(bookingRepository)
@@ -285,7 +285,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void getAllBookingByBookerId_shouldCallFindAllByBookerIdAndStartAfterOrderByStartDesc() {
+    void getAllBookingByBookerIdShouldCallFindAllByBookerIdAndStartAfterOrderByStartDesc() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         bookingService.getAllBookingByBookerId(userId, "FUTURE", null);
         verify(bookingRepository)
@@ -293,7 +293,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void getAllBookingByBookerId_shouldCallFindAllByBookerIdAndStatusOrderByStartDescWithStatusWaiting() {
+    void getAllBookingByBookerIdShouldCallFindAllByBookerIdAndStatusOrderByStartDescWithStatusWaiting() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         bookingService.getAllBookingByBookerId(userId, "WAITING", null);
         verify(bookingRepository)
@@ -301,7 +301,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void getAllBookingByBookerId_shouldCallFindAllByBookerIdAndStatusOrderByStartDescWithStatusRejected() {
+    void getAllBookingByBookerIdShouldCallFindAllByBookerIdAndStatusOrderByStartDescWithStatusRejected() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         bookingService.getAllBookingByBookerId(userId, "REJECTED", null);
         verify(bookingRepository)
@@ -309,28 +309,28 @@ public class BookingServerTest {
     }
 
     @Test
-    void getAllBookingByBookerId_shouldThrowUnsupportedStatusException() {
+    void getAllBookingByBookerIdShouldThrowUnsupportedStatusException() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         assertThatThrownBy(() -> bookingService.getAllBookingByBookerId(userId, "Example", null))
                 .isInstanceOf(StatusException.class);
     }
 
     @Test
-    void getAllBookingByBookerId_shouldThrowEntityNotFoundException() {
+    void getAllBookingByBookerIdShouldThrowEntityNotFoundException() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> bookingService.getAllBookingByBookerId(userId, "Example", null))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void getAllBookingByOwnerId_shouldCallFindAllByItemOwnerIdOrderByStartDesc() {
+    void getAllBookingByOwnerIdShouldCallFindAllByItemOwnerIdOrderByStartDesc() {
         when(itemRepository.findAllByOwnerId(userId)).thenReturn(List.of(item));
         bookingService.getAllBookingByOwnerId(userId, "ALL", null);
         verify(bookingRepository).findAllByItemOwnerIdOrderByStartDesc(anyLong(), any());
     }
 
     @Test
-    void getAllBookingByOwnerId_shouldCallFindAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc() {
+    void getAllBookingByOwnerIdShouldCallFindAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc() {
         when(itemRepository.findAllByOwnerId(userId)).thenReturn(List.of(item));
         bookingService.getAllBookingByOwnerId(userId, "CURRENT", null);
         verify(bookingRepository)
@@ -338,7 +338,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void getAllBookingByOwnerId_shouldCallFindAllByItemOwnerIdAndEndBeforeOrderByStartDesc() {
+    void getAllBookingByOwnerIdShouldCallFindAllByItemOwnerIdAndEndBeforeOrderByStartDesc() {
         when(itemRepository.findAllByOwnerId(userId)).thenReturn(List.of(item));
         bookingService.getAllBookingByOwnerId(userId, "PAST", null);
         verify(bookingRepository)
@@ -346,7 +346,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void getAllBookingByOwnerId_shouldCallFindAllByItemOwnerIdAndStartAfterOrderByStartDesc() {
+    void getAllBookingByOwnerIdShouldCallFindAllByItemOwnerIdAndStartAfterOrderByStartDesc() {
         when(itemRepository.findAllByOwnerId(userId)).thenReturn(List.of(item));
         bookingService.getAllBookingByOwnerId(userId, "FUTURE", null);
         verify(bookingRepository)
@@ -354,7 +354,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void getAllBookingByOwnerId_shouldCallFindAllByItemOwnerIdAndStatusOrderByStartDescWithStatusWaiting() {
+    void getAllBookingByOwnerIdShouldCallFindAllByItemOwnerIdAndStatusOrderByStartDescWithStatusWaiting() {
         when(itemRepository.findAllByOwnerId(userId)).thenReturn(List.of(item));
         bookingService.getAllBookingByOwnerId(userId, "WAITING", null);
         verify(bookingRepository)
@@ -362,7 +362,7 @@ public class BookingServerTest {
     }
 
     @Test
-    void getAllBookingByOwnerId_shouldCallFindAllByItemOwnerIdAndStatusOrderByStartDescWithStatusRejected() {
+    void getAllBookingByOwnerIdShouldCallFindAllByItemOwnerIdAndStatusOrderByStartDescWithStatusRejected() {
         when(itemRepository.findAllByOwnerId(userId)).thenReturn(List.of(item));
         bookingService.getAllBookingByOwnerId(userId, "REJECTED", null);
         verify(bookingRepository)
@@ -370,14 +370,14 @@ public class BookingServerTest {
     }
 
     @Test
-    void getAllBookingByOwnerId_shouldThrowUnsupportedStatusException() {
+    void getAllBookingByOwnerIdShouldThrowUnsupportedStatusException() {
         when(itemRepository.findAllByOwnerId(userId)).thenReturn(List.of(item));
         assertThatThrownBy(() -> bookingService.getAllBookingByOwnerId(userId, "Example", null))
                 .isInstanceOf(StatusException.class);
     }
 
     @Test
-    void getAllBookingByOwnerId_shouldThrowFailIdException() {
+    void getAllBookingByOwnerIdShouldThrowFailIdException() {
         when(itemRepository.findAllByOwnerId(userId)).thenReturn(Collections.emptyList());
         assertThatThrownBy(() -> bookingService.getAllBookingByOwnerId(userId, "Example", null))
                 .isInstanceOf(FailIdException.class);

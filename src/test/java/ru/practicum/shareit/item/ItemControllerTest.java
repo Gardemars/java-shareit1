@@ -72,7 +72,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void add_shouldCreateAndReturnNewItem() throws Exception {
+    void addShouldCreateAndReturnNewItem() throws Exception {
         when(itemMapper.itemToItemDto(any())).thenReturn(itemDto);
 
         mockMvc.perform(post("/items")
@@ -85,7 +85,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void update_shouldUpdateItem() throws Exception {
+    void updateShouldUpdateItem() throws Exception {
         UpdateItemDto updateItemDto = new UpdateItemDto(itemId, itemDto.getName(), itemDto.getDescription(), true);
 
         when(itemMapper.itemToItemDto(any())).thenReturn(itemDto);
@@ -100,7 +100,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void update_shouldReturnNotFound() throws Exception {
+    void updateShouldReturnNotFound() throws Exception {
         UpdateItemDto updateItemDto = new UpdateItemDto(itemId, itemDto.getName(), itemDto.getDescription(), true);
 
         when(itemMapper.itemToItemDto(any())).thenThrow(new EntityNotFoundException(""));
@@ -120,7 +120,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void getByItemId_shouldReturnItem() throws Exception {
+    void getByItemIdShouldReturnItem() throws Exception {
         when(itemMapper.itemToItemGetDto(any())).thenReturn(itemGetDto);
 
         mockMvc.perform(get("/items/" + itemId).header(USER_ID_HEADER, userId))
@@ -129,7 +129,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void getByItemId_shouldReturnNotFound() throws Exception {
+    void getByItemIdShouldReturnNotFound() throws Exception {
         when(itemMapper.itemToItemGetDto(any())).thenThrow(new EntityNotFoundException(""));
 
         mockMvc.perform(get("/items/" + itemId).header(USER_ID_HEADER, userId))
@@ -137,7 +137,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void getByOwnerId_shouldReturnListOfItems() throws Exception {
+    void getByOwnerIdShouldReturnListOfItems() throws Exception {
         List<ItemGetDto> items = List.of(itemGetDto);
 
         when(itemMapper.itemListToItemGetDtoList(any())).thenReturn(items);
@@ -148,7 +148,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void getByOwnerId_shouldReturnNotFound() throws Exception {
+    void getByOwnerIdShouldReturnNotFound() throws Exception {
         when(itemMapper.itemListToItemGetDtoList(any()))
                 .thenThrow(new EntityNotFoundException(""));
 
@@ -157,12 +157,12 @@ public class ItemControllerTest {
     }
 
     @Test
-    void getByOwnerId_shouldReturnInternalServerError() throws Exception {
+    void getByOwnerIdShouldReturnInternalServerError() throws Exception {
         mockMvc.perform(get("/items")).andExpect(status().isInternalServerError());
     }
 
     @Test
-    void search_shouldReturnListOfItems() throws Exception {
+    void searchShouldReturnListOfItems() throws Exception {
         List<ItemDto> items = List.of(itemDto);
 
         when(itemMapper.itemListToItemDtoList(any())).thenReturn(items);
@@ -173,7 +173,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void comment_shouldReturnNewComment() throws Exception {
+    void commentShouldReturnNewComment() throws Exception {
         AddCommentDto addCommentDto = new AddCommentDto("text");
 
         CommentDto comment = new CommentDto(1L, "text", "name", LocalDateTime.now());
@@ -189,7 +189,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    void comment_shouldReturnBadRequest() throws Exception {
+    void commentShouldReturnBadRequest() throws Exception {
         AddCommentDto addCommentDto = new AddCommentDto("text");
 
         when(commentMapper.commentToCommentDto(any())).thenThrow(new ValidationException(""));

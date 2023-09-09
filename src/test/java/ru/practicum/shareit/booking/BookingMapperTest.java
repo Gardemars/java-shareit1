@@ -63,7 +63,7 @@ public class BookingMapperTest {
     }
 
     @Test
-    void bookingToBookingShortDto_shouldReturnBookingShortDto() {
+    void bookingToBookingShortDtoShouldReturnBookingShortDto() {
         BookingShortDto dto = bookingMapper.bookingToBookingShortDto(booking);
 
         assertThat(dto.getId()).isEqualTo(booking.getId());
@@ -71,7 +71,7 @@ public class BookingMapperTest {
     }
 
     @Test
-    void bookingToBookingShortDto_shouldReturnNull() {
+    void bookingToBookingShortDtoShouldReturnNull() {
         BookingShortDto dto = bookingMapper.bookingToBookingShortDto(null);
         assertThat(dto).isEqualTo(null);
     }
@@ -84,7 +84,7 @@ public class BookingMapperTest {
     }
 
     @Test
-    void bookingToBookingAnswerDto_shouldReturnNull() {
+    void bookingToBookingAnswerDtoShouldReturnNull() {
         BookingAnswerDto dto = bookingMapper.bookingToBookingAnswerDto(null);
         assertThat(dto).isEqualTo(null);
     }
@@ -104,7 +104,7 @@ public class BookingMapperTest {
     }
 
     @Test
-    void bookingRequestDtoToBooking_shouldReturnNull() {
+    void bookingRequestDtoToBookingShouldReturnNull() {
         Booking booking1 = bookingMapper.bookingRequestDtoToBooking(null);
         assertThat(booking1).isEqualTo(null);
     }

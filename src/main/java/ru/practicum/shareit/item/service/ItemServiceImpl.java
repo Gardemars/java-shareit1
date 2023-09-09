@@ -139,6 +139,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public Comment addComment(Long itemId, Long userId, Comment comment) {
+        log.info("Добавление комментария");
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Предмет с id = %d не найден в базе", itemId)));
         User user = userRepository.findById(userId).orElseThrow(()
@@ -166,6 +167,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Booking getNextBooking(List<Booking> bookings) {
+        log.info("Получение информации по следующему бронированию");
         List<Booking> filteredBookings = bookings.stream()
                 .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
                 .collect(Collectors.toList());
@@ -174,6 +176,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Booking getLastBooking(List<Booking> bookings) {
+        log.info("Получение информации по последнему бронированию");
         List<Booking> filteredBookings = bookings.stream()
                 .filter(booking -> (booking.getEnd().isAfter(LocalDateTime.now())
                         && booking.getStart().isBefore(LocalDateTime.now())) || booking.getEnd().isBefore(LocalDateTime.now()))

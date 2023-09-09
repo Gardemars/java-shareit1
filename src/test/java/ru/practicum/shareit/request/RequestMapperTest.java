@@ -50,7 +50,7 @@ public class RequestMapperTest {
     }
 
     @Test
-    void requestToRequestAnswerDto_shouldReturnNull() {
+    void requestToRequestAnswerDtoShouldReturnNull() {
         RequestAnswerDto dto = requestMapper.requestToRequestAnswerDto(null);
         assertThat(dto).isEqualTo(null);
     }
@@ -63,13 +63,13 @@ public class RequestMapperTest {
     }
 
     @Test
-    void requestToRequestWithItemDto_shouldReturnNull() {
+    void requestToRequestWithItemDtoShouldReturnNull() {
         RequestWithItemDto dto = requestMapper.requestToRequestWithItemDto(null);
         assertThat(dto).isEqualTo(null);
     }
 
     @Test
-    void requestAddDtoToRequest_shouldReturnNull() {
+    void requestAddDtoToRequestShouldReturnNull() {
         Request request1 = requestMapper.requestAddDtoToRequest(null);
         assertThat(request1).isEqualTo(null);
     }

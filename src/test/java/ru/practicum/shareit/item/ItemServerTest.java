@@ -134,13 +134,13 @@ public class ItemServerTest {
     }
 
     @Test
-    void add_shouldThrowEntityNotFoundExceptionIfUserIsNotExists() {
+    void addShouldThrowEntityNotFoundExceptionIfUserIsNotExists() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> itemService.add(userId, null, item)).isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void add_shouldThrowEntityNotFoundExceptionIfRequestIsNotExists() {
+    void addShouldThrowEntityNotFoundExceptionIfRequestIsNotExists() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(requestRepository.findById(requestId)).thenReturn(Optional.empty());
 
@@ -148,7 +148,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void add_shouldCreateItemWithRequest() {
+    void addShouldCreateItemWithRequest() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(requestRepository.findById(requestId)).thenReturn(Optional.of(request));
         when(itemRepository.save(any())).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
@@ -160,7 +160,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void update_shouldThrowFailIdException() {
+    void updateShouldThrowFailIdException() {
         Item newItem = Item.builder()
                 .id(1L)
                 .name("newName")
@@ -175,7 +175,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void update_shouldThrowEntityNotFoundException() {
+    void updateShouldThrowEntityNotFoundException() {
         Item newItem = Item.builder()
                 .id(1L)
                 .name("newName")
@@ -188,7 +188,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void update_shouldUpdateAll() {
+    void updateShouldUpdateAll() {
         Item newItem = Item.builder()
                 .id(1L)
                 .name("newName")
@@ -208,7 +208,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void update_shouldUpdateName() {
+    void updateShouldUpdateName() {
         Item newItem = Item.builder()
                 .id(1L)
                 .name("newName")
@@ -228,7 +228,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void update_shouldUpdateDescription() {
+    void updateShouldUpdateDescription() {
         Item newItem = Item.builder()
                 .id(1L)
                 .name(null)
@@ -246,7 +246,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void update_shouldUpdateAvailable() {
+    void updateShouldUpdateAvailable() {
         Item newItem = Item.builder()
                 .id(1L)
                 .name(null)
@@ -264,7 +264,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void getByItemId_shouldReturnItem() {
+    void getByItemIdShouldReturnItem() {
         List<Booking> bookings = List.of(booking);
 
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
@@ -281,7 +281,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void getByItemId_shouldThrowEntityNotFoundException() {
+    void getByItemIdShouldThrowEntityNotFoundException() {
         List<Booking> bookings = List.of(booking);
 
         when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
@@ -290,7 +290,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void getByOwnerId_shouldReturnItem() {
+    void getByOwnerIdShouldReturnItem() {
         when(itemRepository.findAllByOwnerId(userId, PaginationMapper.toMakePage(1, 1))).thenReturn(List.of(item));
         when(bookingRepository.findAllByItemIdAndStatusOrderByStartAsc(itemId, BookingStatus.APPROVED)).thenReturn(List.of(booking));
         when(bookingMapper.bookingToBookingShortDto(any())).thenReturn(bookingShortDto);
@@ -303,12 +303,12 @@ public class ItemServerTest {
     }
 
     @Test
-    void search_shouldReturnEmptyListIfTextIsBlank() {
+    void searchShouldReturnEmptyListIfTextIsBlank() {
         assertThat(itemService.search("", null)).isEmpty();
     }
 
     @Test
-    void search_shouldReturnListOfItems() {
+    void searchShouldReturnListOfItems() {
         List<Item> items = List.of(item, item1);
 
         when(itemRepository.findByText(anyString(), any())).thenReturn(items);
@@ -316,7 +316,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void comment_shouldReturnNewComment() {
+    void commentShouldReturnNewComment() {
         Comment newComment = new Comment(1L, "newComment", null, null, null);
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -334,7 +334,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void comment_shouldThrowValidationException() {
+    void commentShouldThrowValidationException() {
         Comment newComment = new Comment(1L, "newComment", null, null, null);
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -347,7 +347,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void comment_shouldThrowEntityNotFoundExceptionIfNotItem() {
+    void commentShouldThrowEntityNotFoundExceptionIfNotItem() {
         Comment newComment = new Comment(1L, "newComment", null, null, null);
         when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
 
@@ -356,7 +356,7 @@ public class ItemServerTest {
     }
 
     @Test
-    void comment_shouldThrowEntityNotFoundExceptionIfNotUser() {
+    void commentShouldThrowEntityNotFoundExceptionIfNotUser() {
         Comment newComment = new Comment(1L, "newComment", null, null, null);
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
         when(userRepository.findById(userId)).thenReturn(Optional.empty());

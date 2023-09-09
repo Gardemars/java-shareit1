@@ -29,7 +29,7 @@ public class ItemRepositoryTest {
     }
 
     @Test
-    void search_shouldReturnListItem() {
+    void searchShouldReturnListItem() {
         String text = "apPle";
 
         User user = User.builder()

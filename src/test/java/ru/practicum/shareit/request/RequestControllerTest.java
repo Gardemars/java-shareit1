@@ -69,7 +69,7 @@ public class RequestControllerTest {
     }
 
     @Test
-    void addRequest_shouldReturnNewRequest() throws Exception {
+    void addRequestShouldReturnNewRequest() throws Exception {
         RequestAddDto requestAddDto = new RequestAddDto(request.getDescription());
         RequestAnswerDto requestAnswerDto = new RequestAnswerDto(requestId, request.getDescription(), request.getCreated());
 
@@ -91,7 +91,7 @@ public class RequestControllerTest {
 
 
     @Test
-    void getAllRequestByOwnerId_shouldReturnListOfRequests() throws Exception {
+    void getAllRequestByOwnerIdShouldReturnListOfRequests() throws Exception {
         List<RequestWithItemDto> requestWithItemDtos = List.of(requestWithItemDto);
 
         when(requestService.getAllRequestsByOwnerId(userId)).thenReturn(requestWithItemDtos);
@@ -103,7 +103,7 @@ public class RequestControllerTest {
     }
 
     @Test
-    void getAllRequestByOwnerId_shouldReturnNotFound() throws Exception {
+    void getAllRequestByOwnerIdShouldReturnNotFound() throws Exception {
         when(requestService.getAllRequestsByOwnerId(userId))
                 .thenThrow(new EntityNotFoundException(""));
 
@@ -112,7 +112,7 @@ public class RequestControllerTest {
     }
 
     @Test
-    void getAllRequests_shouldReturnListOfRequests() throws Exception {
+    void getAllRequestsShouldReturnListOfRequests() throws Exception {
         List<RequestWithItemDto> requestWithItemDtos = List.of(requestWithItemDto);
 
         when(requestService.getAllRequest(anyLong(), any())).thenReturn(requestWithItemDtos);
@@ -123,7 +123,7 @@ public class RequestControllerTest {
     }
 
     @Test
-    void getAllRequests_shouldReturnNotFond() throws Exception {
+    void getAllRequestsShouldReturnNotFond() throws Exception {
         when(requestService.getAllRequest(anyLong(), any()))
                 .thenThrow(new EntityNotFoundException(""));
 
@@ -132,7 +132,7 @@ public class RequestControllerTest {
     }
 
     @Test
-    void getByRequestIdWithItem_shouldReturnRequest() throws Exception {
+    void getByRequestIdWithItemShouldReturnRequest() throws Exception {
         when(requestService.getByRequestIdWithItem(requestId, userId)).thenReturn(requestWithItemDto);
 
         mockMvc.perform(get("/requests/" + requestId).header(USER_ID_HEADER, userId))
@@ -141,7 +141,7 @@ public class RequestControllerTest {
     }
 
     @Test
-    void getByRequestIdWithItem_shouldReturnNotFound() throws Exception {
+    void getByRequestIdWithItemShouldReturnNotFound() throws Exception {
 
         when(requestService.getByRequestIdWithItem(requestId, userId))
                 .thenThrow(new EntityNotFoundException(""));
