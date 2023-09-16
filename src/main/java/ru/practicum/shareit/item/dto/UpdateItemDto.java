@@ -1,12 +1,18 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
-@Value
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class UpdateItemDto {
-    Long id;
-    String name;
-    String description;
-    Boolean available;
+    private Long id;
+    private String name;
+    private String description;
+    private Boolean available;
 }

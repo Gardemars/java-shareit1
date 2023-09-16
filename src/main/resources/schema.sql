@@ -9,6 +9,15 @@ CREATE TABLE IF NOT EXISTS users
         primary key (user_id)
 );
 
+CREATE TABLE IF NOT EXISTS requests
+(
+    request_id  BIGINT AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(255) NOT NULL,
+    created     TIMESTAMP    NOT NULL,
+    user_id     INTEGER      NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS items
 (
     item_id     BIGINT AUTO_INCREMENT,
@@ -16,10 +25,13 @@ CREATE TABLE IF NOT EXISTS items
     description VARCHAR(255) NOT NULL,
     available   BOOLEAN      NOT NULL,
     owner_id    INTEGER      NOT NULL,
+    request_id INTEGER,
     constraint ITEMS_PK
         primary key (item_id),
     constraint "ITEMS_USERS_fk"
-        foreign key (owner_id) references users (user_id) ON DELETE CASCADE
+        foreign key (owner_id) references users (user_id) ON DELETE CASCADE,
+    constraint "ITEMS_REQUESTS_fk"
+        foreign key (request_id) REFERENCES requests (request_id)
 );
 
 CREATE TABLE IF NOT EXISTS booking
