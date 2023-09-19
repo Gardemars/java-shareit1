@@ -37,15 +37,12 @@ public class UserServiceImpl implements UserService {
     public User update(Long id, User user) {
         log.info(String.format("Обновление пользователя c id = %d", id));
         User updateUser = this.getByUserId(id);
-
         if (user.getEmail() != null) {
             updateUser.setEmail(user.getEmail());
         }
-
         if (user.getName() != null) {
             updateUser.setName(user.getName());
         }
-
         try {
             return userRepository.save(updateUser);
         } catch (DataIntegrityViolationException exp) {

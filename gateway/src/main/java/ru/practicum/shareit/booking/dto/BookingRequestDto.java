@@ -18,11 +18,9 @@ import java.time.LocalDateTime;
 public class BookingRequestDto {
     @NotNull(message = "Необходимо указать id предмета")
     private Long itemId;
-
     @NotNull(message = "Необходимо указать время начала бронирования")
     @FutureOrPresent(message = "Время начала бронирования должно быть в будущем")
     private LocalDateTime start;
-
     @NotNull(message = "Необходимо указать время окончания бронирования")
     @Future(message = "Время окончания бронирования должно быть в будущем")
     private LocalDateTime end;

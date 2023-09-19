@@ -21,7 +21,6 @@ public class BookingController {
     private final BookingService bookingService;
     private final BookingMapper bookingMapper;
 
-
     @PostMapping
     public BookingNewAnswerDto add(@RequestHeader(name = USER_ID_HEADER) long bookerId,
                                    @RequestBody BookingRequestDto dto) {

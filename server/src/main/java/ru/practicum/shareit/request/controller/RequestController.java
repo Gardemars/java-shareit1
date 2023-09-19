@@ -47,5 +47,4 @@ public class RequestController {
         log.info("Запрос на выдачу запроса");
         return requestService.getByRequestIdWithItem(requestId, userId);
     }
-
 }

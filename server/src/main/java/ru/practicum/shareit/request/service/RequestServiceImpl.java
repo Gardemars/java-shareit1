@@ -32,7 +32,6 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
 
-
     @Transactional
     @Override
     public Request add(Long userId, Request request) {
@@ -47,7 +46,6 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestWithItemDto> getAllRequestsByOwnerId(Long ownerId) {
         log.info(String.format("Выдача запросов пользователя c id = %d", ownerId));
-
         userRepository.findById(ownerId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", ownerId)));
         return requestRepository.findAllByUserIdOrderByCreatedDesc(ownerId)
@@ -57,7 +55,6 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestWithItemDto> getAllRequest(Long userId, Pageable pageable) {
         log.info("Выдача всех запросов");
-
         userRepository.findById(userId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", userId)));
         return requestRepository.findAllByUserIdNotOrderByCreatedDesc(userId, pageable)
@@ -74,13 +71,10 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public RequestWithItemDto getByRequestIdWithItem(Long requestId, Long userId) {
         log.info(String.format("Выдача запроса вместе с ответами id = %d", requestId));
-
         userRepository.findById(userId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", userId)));
-
         Request request = requestRepository.findById(requestId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("Запрос с id = %d не найден в базе", requestId)));
-
         return addItemsForRequest(request);
     }
 
@@ -89,7 +83,6 @@ public class RequestServiceImpl implements RequestService {
         List<ItemDto> items = itemMapper.itemListToItemDtoList(itemRepository.findAllByRequestId(request.getId()));
         RequestWithItemDto requestWithItemDto = requestMapper.requestToRequestWithItemDto(request);
         requestWithItemDto.setItems(items);
-
         return requestWithItemDto;
     }
 }

@@ -20,12 +20,9 @@ public class Request {
     @Column(name = "request_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(name = "description")
     private String description;
-
     private LocalDateTime created;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

@@ -20,7 +20,6 @@ import java.util.Collections;
 @Controller
 @AllArgsConstructor
 @RequestMapping("/items")
-
 public class ItemController {
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
     private final ItemClient itemClient;
@@ -67,7 +66,6 @@ public class ItemController {
         if (text.isBlank()) {
             return ResponseEntity.ok(Collections.emptyList());
         }
-
         return itemClient.search(text, from, size);
     }
 

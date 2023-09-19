@@ -13,8 +13,6 @@ import java.time.LocalDateTime;
 @Setter
 public class RequestAnswerDto {
     private Long id;
-
     private String description;
-
     private LocalDateTime created;
 }

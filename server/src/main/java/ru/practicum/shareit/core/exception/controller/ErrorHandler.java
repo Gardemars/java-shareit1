@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorResponse handleBindException(MethodArgumentNotValidException exp) {

@@ -11,6 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ItemForBookingDto {
     private Long id;
-
     private String name;
 }

@@ -15,10 +15,7 @@ import java.util.List;
 @Setter
 public class RequestWithItemDto {
     private Long id;
-
     private String description;
-
     private LocalDateTime created;
-
     private List<ItemDto> items;
 }

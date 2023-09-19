@@ -19,11 +19,9 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorResponse handleBindException(MethodArgumentNotValidException exp) {
-
         Map<String, String> errors = exp.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.toMap(FieldError::getField,
                         Objects.requireNonNull(DefaultMessageSourceResolvable::getDefaultMessage)));

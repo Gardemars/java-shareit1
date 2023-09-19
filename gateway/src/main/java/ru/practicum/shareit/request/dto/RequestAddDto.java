@@ -10,7 +10,6 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @Getter
 public class RequestAddDto {
-
     @NotBlank(message = "Описание запроса не может быть пустым")
     private String description;
 }

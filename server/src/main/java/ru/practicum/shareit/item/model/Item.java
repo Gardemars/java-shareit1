@@ -23,21 +23,17 @@ public class Item {
     private String name;
     private String description;
     private Boolean available;
-
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
-
     @Transient
     private BookingShortDto lastBooking;
-
     @Transient
     private BookingShortDto nextBooking;
-
     @Transient
     private List<CommentDto> comments;
-
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "request_id")
     private Request request;

@@ -39,21 +39,17 @@ public class BookingServiceImpl implements BookingService {
         log.info(String.format("Бронирование предмета с id = %d", itemId));
         User booker = userRepository.findById(bookerId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", bookerId)));
-
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Предмет с id = %d не найден в базе", itemId)));
 
         if (!item.getAvailable()) {
             throw new ItemNotAvailableException(String.format("Предмет с id = %d не доступен", itemId));
         }
-
         if (Objects.equals(bookerId, item.getOwner().getId())) {
             throw new FailIdException(String.format(
                     "Делать броннирование вещи с id = %d  владелец не может", itemId));
         }
-
         checkTimeValidation(booking);
-
         booking.setBooker(booker);
         booking.setItem(item);
         booking.setStatus(BookingStatus.WAITING);
@@ -67,15 +63,12 @@ public class BookingServiceImpl implements BookingService {
         log.info(String.format("Получение по Id bookerId = %d и userId = %d", bookingId, userId));
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Броннирование с id = %d не найдено в базе", bookingId)));
-
         boolean isOwner = Objects.equals(booking.getItem().getOwner().getId(), userId);
         boolean isBooker = Objects.equals(booking.getBooker().getId(), userId);
-
         if (!(isOwner || isBooker)) {
             throw new FailIdException(String.format(
                     "Просматривать броннирование с id = %d может только владелец броннирования/вещи", bookingId));
         }
-
         return booking;
     }
 
@@ -85,18 +78,14 @@ public class BookingServiceImpl implements BookingService {
         log.info(String.format("Подтверждние бронирования id = %d", bookingId));
         Booking booking = this.getByBookingId(bookingId, ownerId);
         BookingStatus status = booking.getStatus();
-
         if (!status.equals(BookingStatus.WAITING)) {
             throw new ValidationException(String.format(
                     "Статус бронирования с id = %d уже был изменен ", bookingId));
         }
-
-
         if (Objects.equals(booking.getItem().getOwner().getId(), ownerId)) {
             booking.setStatus(isApprove ? BookingStatus.APPROVED : BookingStatus.REJECTED);
             return bookingRepository.save(booking);
         }
-
         throw new FailIdException(String.format(
                 "Подтверждать броннирование с id = %d может только владелец вещи", bookingId));
     }
@@ -105,12 +94,10 @@ public class BookingServiceImpl implements BookingService {
     public List<Booking> getAllBookingByOwnerId(Long ownerId, String state, Pageable pageable) {
         log.info(String.format("Выдача перечня забронированых вещей с владельцем с id = %d", ownerId));
         List<Item> items = itemRepository.findAllByOwnerId(ownerId);
-
         if (items.isEmpty()) {
             throw new FailIdException(String.format(
                     "Владелец вещей с id = %d отсутствует в базе", ownerId));
         }
-
         try {
             switch (State.valueOf(state)) {
                 case ALL:
@@ -138,7 +125,6 @@ public class BookingServiceImpl implements BookingService {
         log.info(String.format("Выдача перечня забронированых вещей с пользователем с id = %d", bookerId));
         userRepository.findById(bookerId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("Пользователь с id = %d не найден в базе", bookerId)));
-
         try {
             switch (State.valueOf(state)) {
                 case ALL:
@@ -161,15 +147,12 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-
     private void checkTimeValidation(Booking booking) {
         log.info("Проверка времени");
-
         boolean isStartInPast = booking.getStart().isBefore(LocalDateTime.now());
         boolean isEndInPast = booking.getEnd().isBefore(LocalDateTime.now());
         boolean isEndBeforeStart = booking.getEnd().isBefore(booking.getStart());
         boolean isEndEqualStart = booking.getEnd().isEqual(booking.getStart());
-
         if (isStartInPast || isEndInPast || isEndBeforeStart || isEndEqualStart) {
             throw new ValidationException("Время броннирование указано неверно");
         }

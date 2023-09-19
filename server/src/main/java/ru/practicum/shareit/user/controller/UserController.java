@@ -22,7 +22,6 @@ public class UserController {
     @PostMapping
     public UserDto add(@RequestBody RequestUserDto userDto) {
         log.info("Запрос на создание пользователя");
-
         return userMapper.userToUserDto(userService.add(userMapper.requestUserDtoToUser(userDto)));
     }
 

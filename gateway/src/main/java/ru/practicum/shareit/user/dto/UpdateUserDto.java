@@ -13,7 +13,6 @@ import javax.validation.constraints.Email;
 @Setter
 public class UpdateUserDto {
     private String name;
-
     @Email(message = "Введите правильный email")
     private String email;
 }

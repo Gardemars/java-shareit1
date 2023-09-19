@@ -17,18 +17,14 @@ public class Comment {
     @Column(name = "comment_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String text;
-
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;
-
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "author_id")
     private User author;
-
     private LocalDateTime created;
 }
